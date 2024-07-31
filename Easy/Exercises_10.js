@@ -9,7 +9,7 @@ function checkMax(myArray) {
     }
   }
 
-  console.log(`Số lớn nhất trong mảng là ${Max}.`);
+  return Max;
 }
 
 module.exports = {

@@ -53,15 +53,6 @@ function countEven(arr) {
   return count;
 }
 
-function testCountEven() {
-  testCases.forEach((testCase, index) => {
-    const { Array, expected } = testCase;
-    const result = countEven([...Array]); // using spread operator to avoid mutation
-    const isPassed = result === expected;
-    console.log(`Test case ${index + 1}: ${isPassed ? "PASS" : "FAIL"}.`);
-  });
-}
-
 module.exports = {
-  exec: testCountEven,
+  exec: countEven,
 };

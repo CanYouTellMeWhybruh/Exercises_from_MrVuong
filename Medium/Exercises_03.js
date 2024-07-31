@@ -28,8 +28,9 @@ const testCasesArraySum = [
 
 function testArraySum() {
   testCasesArraySum.forEach((testCase, index) => {
-    const { ArrA, ArrB, expected } = testCase;
+    const { ArrA, ArrB, expected } = testCse;
     let Arrtotal = [];
+    a;
     if (ArrA.length !== ArrB.length) {
       console.log(
         `Test case ${index + 1}: FAIL. Hai mảng không có cùng độ dài.`

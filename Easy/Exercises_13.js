@@ -1,16 +1,15 @@
 // Đảo ngược thứ tự mảng số
 
-function reverseArray(myArray){
+function reverseArray(myArray) {
+  let reversedArray = [];
 
-let reversedArray = [];
+  for (let i = myArray.length - 1; i >= 0; i--) {
+    reversedArray.push(myArray[i]);
+  }
 
-for (let i = myArray.length - 1; i >= 0; i--) {
-  reversedArray.push(myArray[i]);
-}
-
-console.log(`Mảng sau khi đảo ngược là ${reversedArray}.`);
+  return reversedArray;
 }
 
 module.exports = {
-  exec : reverseArray,
-}
+  exec: reverseArray,
+};
