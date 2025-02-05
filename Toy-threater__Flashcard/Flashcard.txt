@@ -1,0 +1,251 @@
+**Dự Án: Math Flash Cards**
+
+---
+
+## 1. Giới Thiệu
+**Math Flash Cards** là một trò chơi giáo dục giúp người chơi rèn luyện kỹ năng toán học thông qua các thẻ bài câu hỏi ngẫu nhiên. Trò chơi nhắm đến học sinh tiểu học và trung học cơ sở, giúp họ cải thiện khả năng tính toán nhanh chóng theo một cách thú vị.
+
+## 2. Mục Tiêu Dự Án
+- Tạo một trò chơi toán học đơn giản nhưng hiệu quả để cải thiện khả năng tính toán.
+- Hỗ trợ các phép toán cơ bản: Cộng, Trừ, Nhân, Chia.
+- Cung cấp trải nghiệm thân thiện, dễ sử dụng trên trình duyệt web.
+- Theo dõi tiến độ và điểm số của người chơi.
+- Tạo giao diện sinh động, hấp dẫn để thu hút học sinh.
+
+## 3. Đối Tượng Người Dùng
+- Mọi đối tượng đặc biệt là những học sinh đang học các phép toán cơ bản.
+- Giáo viên và phụ huynh muốn giúp trẻ rèn luyện kỹ năng toán học.
+- Bất kỳ ai muốn nâng cao tốc độ tính toán của mình.
+
+## 4. Tính Năng Chính
+- **Chế độ chơi:**
+  - Câu hỏi ngẫu nhiên với các phép toán cơ bản.
+  - Phạm vi tính toán là từ 0 - 9.
+- **Giao diện đơn giản, dễ sử dụng:**
+  - Hiển thị câu hỏi với bốn lựa chọn đáp án.
+  - Người chơi chọn đáp án bằng cách nhấn vào thẻ bài.
+- **Hệ thống điểm số:**
+  - Cộng 1 điểm cho correct khi trả lời đúng.
+  - Cộng 1 điểm cho incorrect khi trả lời sai.
+  - Hiển thị điểm số sau mỗi lượt chơi.
+- **Giao diện động, hiệu ứng trực quan:**
+  - Sử dụng hoạt ảnh để làm tăng tính hấp dẫn.
+  - Hệ thống phản hồi âm thanh khi chọn đúng/sai.
+
+## 5. Công Nghệ Sử Dụng
+- **Frontend:** HTML, CSS, JavaScript.
+- **Thư viện hỗ trợ:** Phaser.js (hoặc Vanilla JavaScript nếu không dùng framework).
+- **Backend (tuỳ chọn nếu cần lưu trữ dữ liệu người chơi):** Node.js + Express.js.
+- **Cơ sở dữ liệu (nếu cần lưu điểm số):** Firebase / MongoDB.
+
+## 6. Giao Diện Dự Kiến
+- **Màn hình:** Hiển thị phép toán với 5 đáp án. Thêm hai nhân vật tượng trưng biểu lộ cảm xúc khi trả lời đúng/sai.
+
+## 7. Tiến Độ Dự Kiến
+| Giai đoạn  | Công việc                        | Thời gian |
+|------------|---------------------------------|-----------|
+| Giai đoạn 1 | Phân tích yêu cầu, thiết kế giao diện  | 1 tuần     |
+| Giai đoạn 2 | Phát triển chức năng chính (Cộng, Trừ, Nhân, Chia) | 2 tuần     |
+| Giai đoạn 3 | Hoàn thiện giao diện và hiệu ứng  | 1 tuần     |
+| Giai đoạn 4 | Kiểm thử và sửa lỗi             | 1 tuần     |
+| Giai đoạn 5 | Triển khai và thu thập phản hồi  | 1 tuần     |
+
+## 8. Kết Luận
+Dự án **Math Flash Cards** là một trò chơi giáo dục hữu ích, giúp người chơi rèn luyện kỹ năng toán học một cách thú vị. Với giao diện đơn giản, dễ sử dụng và khả năng mở rộng trong tương lai, đây sẽ là một sản phẩm hữu ích cho học sinh và giáo viên.
+
+## Mô tả tổng quan về game: 
+Khi vào game, người chơi sẽ có bốn nút bên phải để chọn loại phép tính. Bên dưới là năm đáp án để lựa chọn. Hai thông số Correct và Incorrect hiển thị ở hai góc trái và phải trên cùng, dùng để tính điểm số.
+
+Ở giữa màn hình là hai nhân vật đang bê phép tính. Các nhân vật này có ba trạng thái biểu lộ cảm xúc:
+
+Bình thường khi chưa lựa chọn đáp án.
+Bối rối khi chọn sai.
+Vui mừng khi chọn đúng.
+Game sẽ tiếp tục diễn ra liên tục mà không có menu khởi động — vào là chơi ngay. Phạm vi tính toán mặc định từ 0 đến 9.
+
+const RANDOM_COUNT_NUMBER = 5;
+const RANDOM_NUMBER = Math.floor(Math.random() * 9) + 1;
+const RANGE_MAX_NUMBER = 9;
+const RANGE_MIN_NUMBER = 1;
+var correctText;
+var incorrectText;
+var leftDude;
+var rightDude;
+// Kích thước và vị trí bảng
+let boardX = 10; // Vị trí X
+let boardY = 90; // Vị trí Y
+let buttonSizeX = 100; // Kích thước ô vuông
+let buttonSizeY = 100;
+let spacing = 0; // Khoảng cách giữa các ô
+
+class MathGame extends Phaser.Scene {
+    constructor() {
+        super({ key: 'MathGame' });
+    }
+
+    preload() {
+        this.load.image('background', 'assets/background.png');
+        this.load.image('card', 'assets/card.png');
+        this.load.spritesheet('characters', 'assets/cast2.png', { frameWidth: 563, frameHeight: 395 });
+    }
+
+    create() {
+        let bg = this.add.image(0, 0, 'background').setOrigin(0, 0);
+        bg.setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
+        this.add.image(385, 328, 'card');
+
+        incorrectText = this.add.text(450, 16, 'Incorrect: 0', { fontSize: '32px', fill: '#000', fontFamily: 'Arial' });
+        correctText = this.add.text(150, 16, 'Correct: 0', { fontSize: '32px', fill: '#000', fontFamily: 'Arial' });
+
+        // Tạo một thẻ <div> chứa phép toán
+        this.questionContainer = this.add.dom(385, 300).createFromHTML(`
+            <div id="math-question" style="
+                font-size: 64px;
+                font-weight: bold;
+                color: black;
+                font-family: Arial;
+                text-align: center;
+                line-height: 1.2;
+                width: fit-content;
+            "></div>
+        `);
+
+    // Gạch ngang dưới dấu "="
+    this.underline = this.add.text(385, 390, "____", {
+        fontSize: "80px",
+        fontStyle: "bold",
+        color: "#000",
+        fontFamily: "Arial",
+        align: "center"
+    }).setOrigin(0.5);
+
+    this.operationBoard = this.add.container(boardX, boardY);
+
+    let operations = [
+        { symbol: '+', type: 'add' },
+        { symbol: '-', type: 'subtract' },
+        { symbol: '×', type: 'multiply' },
+        { symbol: '÷', type: 'divide' }
+    ];
+
+    operations.forEach((operation, index) => {
+        let yOffset = index * (buttonSizeY + spacing);
+
+        let button = this.add.rectangle(0, yOffset, buttonSizeX, buttonSizeY, 0xffffff)
+            .setStrokeStyle(2, 0x000000)
+            .setOrigin(0, 0)
+            .setInteractive({ useHandCursor: true }); // 🖱️ Con trỏ bàn tay
+
+        let text = this.add.text(buttonSizeX / 2, yOffset + buttonSizeY / 2, operation.symbol, {
+            fontSize: '48px',
+            fontStyle: 'bold',
+            color: '#000'
+        }).setOrigin(0.5);
+
+
+        button.on('pointerdown', () => {
+            setTimeout(() => {
+                this.updateMathQuestion(operation.symbol);
+            }, 100);
+        });
+
+         // 🔥 Hiệu ứng khi di chuột vào
+        button.on('pointerover', () => {
+            button.setFillStyle(0xdddddd); // Màu xám nhạt khi hover
+        });
+
+        button.on('pointerout', () => {
+            button.setFillStyle(0xffffff); // Quay lại màu trắng khi rời chuột
+        });
+
+        this.operationBoard.add([button, text]);
+    });
+
+    this.add.existing(this.operationBoard);
+
+        // Tạo hoạt ảnh nhân vật
+
+        this.anims.create({
+            key: 'character',
+            frames: this.anims.generateFrameNumbers('characters', { start: 0, end: 8 }),
+            frameRate: 1,
+            repeat: -1
+        });
+
+        this.characters = this.add.sprite(383, 435, 'characters'); 
+
+        // // Chạy animation
+        // this.characters.play('character');
+
+    }
+
+    updateMathQuestion(symbol) {
+        let [number1, number2] = generateNumbers(symbol);
+        this.questionContainer.setHTML(`
+            <div style="text-align: center; font-size: 64px; font-weight: bold; color: black;">
+                ${number1} <br> ${symbol} <br> ${number2} <br>
+                <hr style="width: 100px; border: 2px solid black;">
+            </div>
+        `);
+        
+    }   
+
+}
+
+const config = {
+    type: Phaser.AUTO,
+    width: 780,
+    height: 777,
+    scene: MathGame
+};
+
+const game = new Phaser.Game(config);
+
+// Tạo ra cặp số 
+
+function generateNumbers(operatorType) {
+    let number1 = Math.floor(Math.random() * (RANGE_MAX_NUMBER - RANGE_MIN_NUMBER + 1)) + RANGE_MIN_NUMBER;
+    let number2 = Math.floor(Math.random() * (RANGE_MAX_NUMBER - RANGE_MIN_NUMBER + 1)) + RANGE_MIN_NUMBER;
+
+    if (operatorType === "-") {
+        if (number1 < number2) [number1, number2] = [number2, number1];
+    } else if (operatorType === "÷") {
+        let divisors = [];
+        for (let i = 1; i <= number1; i++) {
+            if (number1 % i === 0) divisors.push(i);
+        }
+        number2 = divisors[Math.floor(Math.random() * divisors.length)];
+    }
+    return [number1, number2];
+}
+
+// Tạo ra các options
+
+function generateValue(number1, number2, Type) {
+    let answer;
+    if (Type === "+") {
+        answer = number1 + number2;
+    } else if (Type === "-") {
+        answer = number1 - number2;
+    } else if (Type === "×") {
+        answer = number1 * number2;
+    } else {
+        answer = number1 / number2;
+    }
+
+    let optionValues = [];
+    const randomIndex = Math.floor(Math.random() * RANDOM_COUNT_NUMBER);
+
+    for (let j = 0; j < RANDOM_COUNT_NUMBER; j++) {
+        if (j === randomIndex) {
+            optionValues.push(answer);
+        } else {
+            let randomAnswer;
+            do {
+                randomAnswer = answer + RANDOM_NUMBER;
+            } while (optionValues.includes(randomAnswer));
+            optionValues.push(randomAnswer);
+        }
+    }
+    return optionValues;
+}
