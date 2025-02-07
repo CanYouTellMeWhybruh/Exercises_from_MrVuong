@@ -38,7 +38,7 @@ class MathGame extends Phaser.Scene {
         bg.setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
         let card = this.add.image(385, -200, 'card');
 
-        // Thêm âm thanh và các thông sốsố
+        // Thêm âm thanh và các thông số
         this.initial = this.sound.add('initial');
         this.incorrectText = this.add.text(450, 16, 'Incorrect: 0', { fontSize: '32px', fill: '#000', fontFamily: 'Arial' });
         this.correctText = this.add.text(150, 16, 'Correct: 0', { fontSize: '32px', fill: '#000', fontFamily: 'Arial' });
@@ -62,7 +62,7 @@ class MathGame extends Phaser.Scene {
             align: "center"
         }).setOrigin(0.5); ///////////////////
         
-        // Set vị trí cho đáp án được lựa chọnchọn
+        // Set vị trí cho đáp án được lựa chọn
         this.answerText = this.add.text(410, 440, "", {
             fontSize: "64px",
             fontStyle: "bold",
