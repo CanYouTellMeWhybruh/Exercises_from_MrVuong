@@ -17,6 +17,9 @@ let boardY = 90; // Vị trí Y
 let buttonSizeX = 110; // Kích thước ô vuông
 let buttonSizeY = 110;
 let spacing = 0; // Khoảng cách giữa các ô
+// let chosen = false;
+let currentType;
+let currentSymbol;
 class MathGame extends Phaser.Scene {
   constructor() {
     super({ key: "MathGame" });
@@ -93,23 +96,12 @@ class MathGame extends Phaser.Scene {
     this.success = this.sound.add("success");
     // create CartContainer 
     this.card = this.add.image(385, -200, 'card'); // Bắt đầu từ trên màn hình
-    this.tweens.add({
-        targets: this.card,
-        y: 328, // Điểm rơi xuống
-        duration: 1000, // Thời gian rơi (1s)
-        ease: 'Bounce.Out' // Hiệu ứng nảy nhẹ
-    });
     this.incorrectText = this.add.text(450, 16, "Incorrect: 0", {
       fontSize: "32px",
       fill: "#000",
       fontFamily: "Arial",
     });
     this.correctText = this.add.text(150, 16, "Correct: 0", {
-      fontSize: "32px",
-      fill: "#000",
-      fontFamily: "Arial",
-    });
-    this.tutorialText = this.add.text(215, 90, "Select an answer below", {
       fontSize: "32px",
       fill: "#000",
       fontFamily: "Arial",
@@ -139,13 +131,23 @@ class MathGame extends Phaser.Scene {
       });
   
       this.anims.create({
+        key: "character-catch",
+        frames: [
+          { key: "characters", frame: 3 },
+          { key: "characters", frame: 4 },
+          { key: "characters", frame: 2 },
+          { key: "characters", frame: 1 },
+          { key: "characters", frame: 0 },
+        ],
+        frameRate: FRAME_RATE,
+        repeat: 0,
+      });
+
+      this.anims.create({
         key: "character-wait",
         frames: [
           { key: "characters", frame: 4 },
           { key: "characters", frame: 3 },
-          { key: "characters", frame: 2 },
-          { key: "characters", frame: 1 },
-          { key: "characters", frame: 0 },
         ],
         frameRate: FRAME_RATE,
         repeat: 0,
@@ -165,7 +167,7 @@ class MathGame extends Phaser.Scene {
       this.mathContainer = this.add.container(385, 250); // Đặt tại vị trí trung tâm
 
       // Phép toán
-      this.questionTextNumber1 = this.add.text(40, 0, "", {
+      this.questionTextNumber1 = this.add.text(45, 0, "", {
           fontSize: "64px",
           fontStyle: "bold",
           color: "#000",
@@ -180,9 +182,14 @@ class MathGame extends Phaser.Scene {
         fontFamily: "Arial",
         align: "center"
     }).setOrigin(0.5);
-      
+    
+    this.tutorialText = this.add.text(-170, -150, "Select an answer below", {
+        fontSize: "32px",
+        fill: "#000",
+        fontFamily: "Arial",
+      });
       // Gạch ngang
-      this.underline = this.add.text(0, 80, "_____", {
+      this.underline = this.add.text(0, 90, "_____", {
           fontSize: "64px",
           fontStyle: "bold",
           color: "#000",
@@ -191,7 +198,7 @@ class MathGame extends Phaser.Scene {
       }).setOrigin(0.5);
       
       // Đáp án
-      this.answerText = this.add.text(40, 150, "", {
+      this.answerText = this.add.text(45, 170, "", {
           fontSize: "64px",
           fontStyle: "bold",
           color: "#000",
@@ -200,8 +207,17 @@ class MathGame extends Phaser.Scene {
       }).setOrigin(0.5);
       
       // Thêm vào container
-      this.mathContainer.add([this.questionTextNumber1, this.questionTextNumber2, this.underline, this.answerText]);
-
+      this.mathContainer.add([this.questionTextNumber1, this.questionTextNumber2, this.underline, this.answerText, this.tutorialText]);
+      this.mathContainer.setVisible(false);
+      this.tweens.add({
+        targets: this.card,
+        y: 328, // Điểm rơi xuống
+        duration: 500, // Thời gian rơi (1s)
+        ease: 'Linear', // Hiệu ứng nảy nhẹ
+        onComplete: () => {
+            this.mathContainer.setVisible(true);
+        }
+    });
       
 
     this.operationBoard = this.add.container(boardX, boardY);
@@ -237,9 +253,8 @@ class MathGame extends Phaser.Scene {
             button.setFillStyle(0xFFFACD);
             this.updateMathQuestion(operation.type, operation.symbol);
         }
-      this.characters.play('character-wait');
+      this.characters.play('character-catch');
       this.updateMathQuestion(DEFAULT_TYPE, DEFAULT_SYMBOL);
-
       button.on("pointerdown", () => {
         if (selectedButton && selectedButton !== button) {
           selectedButton.setFillStyle(0xffffff);
@@ -247,7 +262,11 @@ class MathGame extends Phaser.Scene {
 
         selectedButton = button;
         button.setFillStyle(0xfffacd);
-        this.updateMathQuestion(operation.type, operation.symbol);
+        currentSymbol = operation.symbol;
+        currentType = operation.type;
+        // if(chosen === true){
+        // this.updateMathQuestion(currentType, currentSymbol);
+        // }
       });
 
       // 🔥 Hiệu ứng hover
@@ -269,6 +288,8 @@ class MathGame extends Phaser.Scene {
   }
 
   dropCardAnimation(onCompleteCallback) {
+    this.mathContainer.setVisible(false);
+    this.waitAnimation();
     this.tweens.add({
         targets: this.card,
         y: 800, // Rơi xuống dưới màn hình
@@ -281,14 +302,22 @@ class MathGame extends Phaser.Scene {
             this.tweens.add({
                 targets: this.card,
                 y: 328,
-                duration: 1000,
-                ease: 'Bounce.Out'
+                duration: 500,
+                ease: 'Linear',
+                onComplete: () => {
+                    this.mathContainer.setVisible(true);
+                }
             });
         }
     });
+
     }
 
   catchAnimation() {
+    this.characters.play("character-catch");
+  }
+
+  waitAnimation(){
     this.characters.play("character-wait");
   }
 
@@ -312,27 +341,46 @@ class MathGame extends Phaser.Scene {
 
   // Choice
   createChoice(options) {
+    this.answerContainer = this.add.container(0, 0); // Container chứa các đáp án
     this.answerButtons = [];
+
     for (let i = 0; i < RANDOM_COUNT_NUMBER; i++) {
-      let btn = this.add
-        .rectangle(110 + i * 140, 700, 125, 125, 0xffffff)
-        .setStrokeStyle(2, 0x000000)
-        .setOrigin(0.5)
-        .setInteractive({ useHandCursor: true });
+      let xPos = 110 + i * 140;
+      let yPos = 700;
+      let width = 125;
+      let height = 125;
+      let radius = 20; // Độ cong viền
+
+      // Tạo nút có viền bo tròn
+      let buttonGraphics = this.add.graphics();
+      buttonGraphics.fillStyle(0xffffff, 1);
+      buttonGraphics.fillRoundedRect(-width / 2, -height / 2, width, height, radius);
+      buttonGraphics.lineStyle(4, 0x000000); // Viền đen 4px
+      buttonGraphics.strokeRoundedRect(-width / 2, -height / 2, width, height, radius);
+
+      let btn = this.add.container(xPos, yPos, [buttonGraphics]);
+      btn.setSize(width, height);
+      btn.setInteractive({ useHandCursor: true });
 
       let txt = this.add
-        .text(110 + i * 140, 700, `${options[i]}`, {
-          fontSize: "48px",
-          fontStyle: "bold",
-          color: "#000",
-        })
-        .setOrigin(0.5);
+          .text(xPos, yPos, `${options[i]}`, {
+              fontSize: "48px",
+              fontStyle: "bold",
+              color: "#000",
+          })
+          .setOrigin(0.5);
 
-      btn.on("pointerdown", () => this.checkAnswer(parseInt(txt.text)));
-      this.answerButtons.push({ btn, txt });
-      this.tweensAnswerButton();
+        btn.on("pointerdown", () => 
+          this.checkAnswer(parseInt(txt.text)));
+
+        // Thêm cả button và text vào container
+        this.answerContainer.add([btn, txt]);
+
+        // Lưu trữ tham chiếu để có thể cập nhật sau này
+        this.answerButtons.push({ btn, txt });
     }
-  }
+}
+
 
   // Cập nhật phép tính
   updateMathQuestion(operatorType, symbol) {
@@ -348,16 +396,25 @@ class MathGame extends Phaser.Scene {
     this.questionTextNumber1.setText(`${number1}`);
     this.questionTextNumber2.setText(`${symbol}   ${number2}`);
 
+    // ✅ Thay đổi giá trị trong các button thay vì tạo lại
+    this.answerButtons.forEach((choice, index) => {
+      choice.txt.setText(this.options[index]);
+      choice.btn.setInteractive({ useHandCursor: true });
+  });
+
     // Cập nhật lại danh sách đáp án
     this.updateChoices();
   }
 
   checkAnswer(selected) {
+    this.answerButtons.forEach(choice => choice.btn.disableInteractive());
+
     if (selected === this.correctAnswer) {
       correctCount++;
       this.correctText.setText(`Correct: ${correctCount}`);
       this.answerText.setText(selected);
       this.successAnimation(); // Gọi animation khi đúng
+      
       this.sparkles.setVisible(true);
       this.sparkles.play("sparkle");
     } else {
@@ -367,18 +424,18 @@ class MathGame extends Phaser.Scene {
       this.failureAnimation();
     }
 
+
+
     // Hiển thị đáp án và chờ trước khi tạo câu hỏi mới
     this.time.delayedCall(1500, () => {
       this.sparkles.setVisible(false);
       this.answerText.setText("");
-      this.catchAnimation();
       this.dropCardAnimation(() => {
-        this.updateMathQuestion(this.currentOperatorType, this.currentSymbol);
+        this.catchAnimation();
+        this.updateMathQuestion(currentType, currentSymbol);
+        // chosen = false;
     });
     });
-  }
-  tweensAnswerButton(){
-    
   }
 }
 
