@@ -262,8 +262,9 @@ class MathGame extends Phaser.Scene {
 
         selectedButton = button;
         button.setFillStyle(0xfffacd);
-        currentSymbol = operation.symbol;
-        currentType = operation.type;
+        // Lưu toán tử hiện tại để gọi lại khi cần
+        this.currentOperatorType = operation.type;
+        this.currentSymbol = operation.symbol;
         // if(chosen === true){
         // this.updateMathQuestion(currentType, currentSymbol);
         // }
@@ -389,9 +390,6 @@ class MathGame extends Phaser.Scene {
     this.options = this.generateOptions(this.correctAnswer);
     this.createChoice(this.options);
 
-    // Lưu toán tử hiện tại để gọi lại khi cần
-    this.currentOperatorType = operatorType;
-    this.currentSymbol = symbol;
 
     this.questionTextNumber1.setText(`${number1}`);
     this.questionTextNumber2.setText(`${symbol}   ${number2}`);
@@ -432,7 +430,7 @@ class MathGame extends Phaser.Scene {
       this.answerText.setText("");
       this.dropCardAnimation(() => {
         this.catchAnimation();
-        this.updateMathQuestion(currentType, currentSymbol);
+        this.updateMathQuestion(this.currentOperatorType, this.currentSymbol);
         // chosen = false;
     });
     });
