@@ -265,7 +265,7 @@ class MathGame extends Phaser.Scene {
           fontFamily: "Arial",
           align: "center"
       }).setOrigin(0.5);
-      this.createOperationBoard(boardX, boardY, buttonSizeX, buttonSizeY, spacing);
+      
       // Thêm vào container
       this.mathContainer.add([this.questionTextNumber1, this.questionTextNumber2, this.underline, this.answerText, this.tutorialText]);
       this.mathContainer.setVisible(false);
@@ -280,6 +280,8 @@ class MathGame extends Phaser.Scene {
             this.mathContainer.setVisible(true);
         }
     });
+
+    this.createOperationBoard(boardX, boardY, buttonSizeX, buttonSizeY, spacing);
 }
   dropCardAnimation(onCompleteCallback) {
     this.mathContainer.setVisible(false);
@@ -334,8 +336,6 @@ class MathGame extends Phaser.Scene {
     });
   }
 
-
-
   // Choice
   createChoice(options) {
     this.answerContainer = this.add.container(0, 0); // Container chứa các đáp án
@@ -370,15 +370,8 @@ class MathGame extends Phaser.Scene {
           })
           .setOrigin(0.5);
 
-          btn.on("pointerdown", () => {
-            this.checkAnswer(parseInt(txt.text)); // Kiểm tra đáp án
-            this.clearChoices(); // Xóa các lựa chọn cũ
-        
-            this.time.delayedCall(600, () => { 
-                this.updateChoices(); // Tạo câu hỏi mới sau khi hiệu ứng hoàn tất
-            });
-        });
-        
+        btn.on("pointerdown", () => 
+          this.checkAnswer(parseInt(txt.text)));
 
         // Thêm cả button và text vào container
         this.answerContainer.add([btn, txt]);
@@ -393,21 +386,6 @@ class MathGame extends Phaser.Scene {
   
 }
 
-clearChoices() {
-  if (this.answerContainer) {
-      this.tweens.add({
-          targets: this.answerContainer.list, // Lấy toàn bộ phần tử trong container
-          alpha: 0, // Mờ dần
-          scaleX: 0, // Thu nhỏ dần
-          scaleY: 0,
-          duration: 500,
-          onComplete: () => {
-              this.answerContainer.removeAll(true); // Xóa toàn bộ phần tử trong container
-              this.answerButtons = []; // Reset mảng chứa buttons
-          },
-      });
-  }
-}
 
 
   // Cập nhật phép tính
