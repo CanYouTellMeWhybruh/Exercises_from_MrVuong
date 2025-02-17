@@ -3,22 +3,42 @@ const RANDOM_NUMBER = Math.floor(Math.random() * 9) + 1;
 const RANGE_MAX_NUMBER = 9;
 const RANGE_MIN_NUMBER = 1;
 const FRAME_RATE = 7;
-const HEIGHT_SCENE = 777;
-const WIDTH_SCENE = 780;
 const DEFAULT_SYMBOL = "+";
 const DEFAULT_TYPE = "add";
+const HExA_BUTTON = 0xfff66d;
+const WIDTH_SCENE = window.innerWidth;
+const HEIGHT_SCENE = window.innerHeight;
 let correctCount = 0;
 let incorrectCount = 0;
-// Kích thước và vị trí bảng
-let boardX = 10; // Vị trí X
-let boardY = 90; // Vị trí Y
-let buttonSizeX = 110; // Kích thước ô vuông
+let boardX = 10; 
+let boardY = 90;
+let buttonSizeX = 110; 
 let buttonSizeY = 110;
-let spacing = 0; // Khoảng cách giữa các ô
-// let chosen = false;
+let spacing = 0;
 class MathGame extends Phaser.Scene {
   constructor() {
     super({ key: "MathGame" });
+  }
+
+  // Tạo điểm số
+  createText(x, y, text) {
+    return this.add.text(x, y, text, {
+      fontSize: "32px",
+      fill: "#000",
+      fontFamily: "Arial",
+    });
+  }
+  // Tạo bảng câu hỏi
+  createCenteredText(x, y, text, fontSize = "64px") {
+    return this.add
+      .text(x, y, text, {
+        fontSize,
+        fontStyle: "bold",
+        color: "#000",
+        fontFamily: "Arial",
+        align: "center",
+      })
+      .setOrigin(0.5);
   }
 
   generateNumbers(type) {
@@ -68,25 +88,25 @@ class MathGame extends Phaser.Scene {
 
   createOperationBoard(boardX, boardY, buttonSizeX, buttonSizeY, spacing) {
     this.operationBoard = this.add.container(boardX, boardY);
-  
+
     let operations = [
       { symbol: "+", type: "add" },
       { symbol: "-", type: "subtract" },
       { symbol: "×", type: "multiply" },
       { symbol: "÷", type: "divide" },
     ];
-  
+
     let selectedButton = null;
-  
+
     operations.forEach((operation, index) => {
       let yOffset = index * (buttonSizeY + spacing);
-  
+
       let button = this.add
         .rectangle(0, yOffset, buttonSizeX, buttonSizeY, 0xffffff)
         .setStrokeStyle(2, 0x000000)
         .setOrigin(0, 0)
         .setInteractive({ useHandCursor: true });
-  
+
       let text = this.add
         .text(buttonSizeX / 2, yOffset + buttonSizeY / 2, operation.symbol, {
           fontSize: "48px",
@@ -94,39 +114,39 @@ class MathGame extends Phaser.Scene {
           color: "#000",
         })
         .setOrigin(0.5);
-  
+
       if (index === 0) {
         selectedButton = button;
-        button.setFillStyle(0xfffacd);
+        button.setFillStyle(HExA_BUTTON);
         this.currentOperatorType = operation.type;
         this.currentSymbol = operation.symbol;
         this.updateMathQuestion(this.currentOperatorType, this.currentSymbol);
       }
-  
+
       button.on("pointerdown", () => {
         if (selectedButton && selectedButton !== button) {
           selectedButton.setFillStyle(0xffffff);
         }
-  
+
         selectedButton = button;
-        button.setFillStyle(0xfffacd);
-  
+        button.setFillStyle(HExA_BUTTON);
+
         this.currentOperatorType = operation.type;
         this.currentSymbol = operation.symbol;
       });
-  
+
       // Hiệu ứng hover
       button.on("pointerover", () => {
         if (selectedButton !== button) button.setFillStyle(0xdddddd);
       });
-  
+
       button.on("pointerout", () => {
         if (selectedButton !== button) button.setFillStyle(0xffffff);
       });
-  
+
       this.operationBoard.add([button, text]);
     });
-  
+
     this.add.existing(this.operationBoard);
   }
 
@@ -154,165 +174,151 @@ class MathGame extends Phaser.Scene {
     this.failure = this.sound.add("failure");
     this.catch = this.sound.add("catch");
     this.success = this.sound.add("success");
-    // create CartContainer 
-    this.card = this.add.image(385, -200, 'card'); // Bắt đầu từ trên màn hình
-    this.incorrectText = this.add.text(450, 16, "Incorrect: 0", {
-      fontSize: "32px",
-      fill: "#000",
-      fontFamily: "Arial",
-    });
-    this.correctText = this.add.text(150, 16, "Correct: 0", {
-      fontSize: "32px",
-      fill: "#000",
-      fontFamily: "Arial",
-    });
+    this.card = this.add.image(385, -200, "card"); 
+    this.incorrectText = this.createText(450, 16, "Incorrect: 0");
+    this.correctText = this.createText(150, 16, "Correct: 0");
 
-    // Tạo hoạt ảnh nhân vật 
+    // Tạo hoạt ảnh nhân vật
 
     this.anims.create({
-        key: "character-success",
-        frames: [
-          { key: "characters", frame: 0 },
-          { key: "characters", frame: 7 },
-          { key: "characters", frame: 8 },
-        ],
-        frameRate: FRAME_RATE,
-        repeat: 0,
-      });
-  
-      this.anims.create({
-        key: "character-fail",
-        frames: [
-          { key: "characters", frame: 5 },
-          { key: "characters", frame: 6 },
-        ],
-        frameRate: FRAME_RATE,
-        repeat: 0,
-      });
-  
-      this.anims.create({
-        key: "character-catch",
-        frames: [
-          { key: "characters", frame: 3 },
-          { key: "characters", frame: 4 },
-          { key: "characters", frame: 2 },
-          { key: "characters", frame: 1 },
-          { key: "characters", frame: 0 },
-        ],
-        frameRate: FRAME_RATE,
-        repeat: 0,
-      });
+      key: "character-success",
+      frames: [
+        { key: "characters", frame: 0 },
+        { key: "characters", frame: 7 },
+        { key: "characters", frame: 8 },
+      ],
+      frameRate: FRAME_RATE,
+      repeat: 0,
+    });
 
-      this.anims.create({
-        key: "character-wait",
-        frames: [
-          { key: "characters", frame: 4 },
-          { key: "characters", frame: 3 },
-        ],
-        frameRate: FRAME_RATE,
-        repeat: 0,
-      });
-  
-      this.anims.create({
-        key: "sparkle",
-        frames: this.anims.generateFrameNumbers("sparkle", { start: 0, end: 8 }),
-        frameRate: FRAME_RATE,
-        repeat: -1,
-      });
-  
-      this.characters = this.add.sprite(383, 435, "characters");
-      this.sparkles = this.add.sprite(385, 660, "sparkle");
-  
+    this.anims.create({
+      key: "character-fail",
+      frames: [
+        { key: "characters", frame: 5 },
+        { key: "characters", frame: 6 },
+      ],
+      frameRate: FRAME_RATE,
+      repeat: 0,
+    });
 
-      this.mathContainer = this.add.container(385, 250); // Đặt tại vị trí trung tâm
+    this.anims.create({
+      key: "character-catch",
+      frames: [
+        { key: "characters", frame: 3 },
+        { key: "characters", frame: 4 },
+        { key: "characters", frame: 2 },
+        { key: "characters", frame: 1 },
+        { key: "characters", frame: 0 },
+      ],
+      frameRate: FRAME_RATE,
+      repeat: 0,
+    });
 
-      // Phép toán
-      this.questionTextNumber1 = this.add.text(45, 0, "", {
-          fontSize: "64px",
-          fontStyle: "bold",
-          color: "#000",
-          fontFamily: "Arial",
-          align: "center"
-      }).setOrigin(0.5);
+    this.anims.create({
+      key: "character-wait",
+      frames: [
+        { key: "characters", frame: 4 },
+        { key: "characters", frame: 3 },
+      ],
+      frameRate: FRAME_RATE,
+      repeat: 0,
+    });
 
-      this.questionTextNumber2 = this.add.text(0, 70, "", {
+    this.anims.create({
+      key: "sparkle",
+      frames: this.anims.generateFrameNumbers("sparkle", { start: 0, end: 8 }),
+      frameRate: FRAME_RATE,
+      repeat: -1,
+    });
+
+    this.characters = this.add.sprite(383, 435, "characters");
+    this.sparkles = this.add.sprite(385, 660, "sparkle");
+
+    this.mathContainer = this.add.container(385, 250);
+
+    // Phép toán
+    this.questionTextNumber1 = this.add
+      .text(45, 0, "", {
         fontSize: "64px",
         fontStyle: "bold",
         color: "#000",
         fontFamily: "Arial",
-        align: "center"
-    }).setOrigin(0.5);
-    
-    this.tutorialText = this.add.text(-170, -150, "Select an answer below", {
-        fontSize: "32px",
-        fill: "#000",
+        align: "center",
+      })
+      .setOrigin(0.5);
+
+    this.questionTextNumber2 = this.add
+      .text(0, 70, "", {
+        fontSize: "64px",
+        fontStyle: "bold",
+        color: "#000",
         fontFamily: "Arial",
-      });
-      // Gạch ngang
-      this.underline = this.add.text(0, 90, "_____", {
-          fontSize: "64px",
-          fontStyle: "bold",
-          color: "#000",
-          fontFamily: "Arial",
-          align: "center"
-      }).setOrigin(0.5);
-      
-      // Đáp án
-      this.answerText = this.add.text(45, 170, "", {
-          fontSize: "64px",
-          fontStyle: "bold",
-          color: "#000",
-          fontFamily: "Arial",
-          align: "center"
-      }).setOrigin(0.5);
-      this.createOperationBoard(boardX, boardY, buttonSizeX, buttonSizeY, spacing);
-      // Thêm vào container
-      this.mathContainer.add([this.questionTextNumber1, this.questionTextNumber2, this.underline, this.answerText, this.tutorialText]);
-      this.mathContainer.setVisible(false);
-      this.tweens.add({
-        targets: this.card,
-        y: 328, // Điểm rơi xuống
-        duration: 500, // Thời gian rơi (1s)
-        ease: 'Linear', // Hiệu ứng nảy nhẹ
-        onComplete: () => {
-            this.catch.play();
-            this.initial.play();
-            this.mathContainer.setVisible(true);
-        }
+        align: "center",
+      })
+      .setOrigin(0.5);
+
+    this.tutorialText = this.createText(-170, -150, "Select an answer below");
+    this.underline = this.createCenteredText(0, 90, "_____");
+    this.answerText = this.createCenteredText(45, 170, "");
+    this.createOperationBoard(
+      boardX,
+      boardY,
+      buttonSizeX,
+      buttonSizeY,
+      spacing
+    );
+    // Thêm vào container
+    this.mathContainer.add([
+      this.questionTextNumber1,
+      this.questionTextNumber2,
+      this.underline,
+      this.answerText,
+      this.tutorialText,
+    ]);
+    this.mathContainer.setVisible(false);
+    this.tweens.add({
+      targets: this.card,
+      y: 328,
+      duration: 500,
+      ease: "Linear",
+      onComplete: () => {
+        this.catch.play();
+        this.initial.play();
+        this.mathContainer.setVisible(true);
+      },
     });
-}
+  }
   dropCardAnimation(onCompleteCallback) {
     this.mathContainer.setVisible(false);
     this.waitAnimation();
     this.tweens.add({
-        targets: this.card,
-        y: 800, // Rơi xuống dưới màn hình
-        duration: 700,
-        ease: 'Quad.In',
-        onComplete: () => {
-            this.card.y = -200; // Đặt lại vị trí ban đầu
-            if (onCompleteCallback) onCompleteCallback(); // Gọi callback khi hoàn thành
+      targets: this.card,
+      y: 800,
+      duration: 700,
+      ease: "Quad.In",
+      onComplete: () => {
+        this.card.y = -200;
+        if (onCompleteCallback) onCompleteCallback();
 
-            this.tweens.add({
-                targets: this.card,
-                y: 328,
-                duration: 500,
-                ease: 'Linear',
-                onComplete: () => {
-                  this.catch.play();
-                  this.mathContainer.setVisible(true);
-                }
-            });
-        }
+        this.tweens.add({
+          targets: this.card,
+          y: 328,
+          duration: 500,
+          ease: "Linear",
+          onComplete: () => {
+            this.catch.play();
+            this.mathContainer.setVisible(true);
+          },
+        });
+      },
     });
+  }
 
-    }
-    
   catchAnimation() {
     this.characters.play("character-catch");
   }
 
-  waitAnimation(){
+  waitAnimation() {
     this.characters.play("character-wait");
   }
 
@@ -334,115 +340,115 @@ class MathGame extends Phaser.Scene {
     });
   }
 
-
-
-  // Choice
   createChoice(options) {
-    this.answerContainer = this.add.container(0, 0); // Container chứa các đáp án
+    this.answerContainer = this.add.container(0, 0);
     this.answerButtons = [];
     if (!this.answerContainer) {
       this.answerContainer = this.add.container(0, 0);
       this.answerButtons = [];
-  }
+    }
     for (let i = 0; i < RANDOM_COUNT_NUMBER; i++) {
       let xPos = 110 + i * 140;
       let yPos = 700;
       let width = 125;
       let height = 125;
-      let radius = 20; // Độ cong viền
+      let radius = 20;
 
-      // Tạo nút có viền bo tròn
       let buttonGraphics = this.add.graphics();
       buttonGraphics.fillStyle(0xffffff, 1);
-      buttonGraphics.fillRoundedRect(-width / 2, -height / 2, width, height, radius);
-      buttonGraphics.lineStyle(4, 0x000000); // Viền đen 4px
-      buttonGraphics.strokeRoundedRect(-width / 2, -height / 2, width, height, radius);
+      buttonGraphics.fillRoundedRect(
+        -width / 2,
+        -height / 2,
+        width,
+        height,
+        radius
+      );
+      buttonGraphics.lineStyle(4, 0x000000);
+      buttonGraphics.strokeRoundedRect(
+        -width / 2,
+        -height / 2,
+        width,
+        height,
+        radius
+      );
 
       let btn = this.add.container(xPos, yPos, [buttonGraphics]);
       btn.setSize(width, height);
       btn.setInteractive({ useHandCursor: true });
 
       let txt = this.add
-          .text(xPos, yPos, `${options[i]}`, {
-              fontSize: "48px",
-              fontStyle: "bold",
-              color: "#000",
-          })
-          .setOrigin(0.5);
+        .text(xPos, yPos, `${options[i]}`, {
+          fontSize: "48px",
+          fontStyle: "bold",
+          color: "#000",
+        })
+        .setOrigin(0.5);
 
-          btn.on("pointerdown", () => {
-            this.checkAnswer(parseInt(txt.text)); // Kiểm tra đáp án
-            this.clearChoices(); // Xóa các lựa chọn cũ
-        
-            this.time.delayedCall(600, () => { 
-                this.updateChoices(); // Tạo câu hỏi mới sau khi hiệu ứng hoàn tất
-            });
+      btn.on("pointerdown", () => {
+        this.checkAnswer(parseInt(txt.text));
+        this.clearChoices();
+
+        this.time.delayedCall(600, () => {
+          this.updateChoices();
         });
-        
+      });
 
-        // Thêm cả button và text vào container
-        this.answerContainer.add([btn, txt]);
+      this.answerContainer.add([btn, txt]);
 
-        // Lưu trữ tham chiếu để có thể cập nhật sau này
-        this.answerButtons.push({ btn, txt });
+      this.answerButtons.push({ btn, txt });
     }
     this.answerButtons.forEach((choice, index) => {
       choice.txt.setText(options[index]);
       choice.btn.setInteractive({ useHandCursor: true });
-  });
-  
-}
-
-clearChoices() {
-  if (this.answerContainer) {
-      this.tweens.add({
-          targets: this.answerContainer.list, // Lấy toàn bộ phần tử trong container
-          alpha: 0, // Mờ dần
-          scaleX: 0, // Thu nhỏ dần
-          scaleY: 0,
-          duration: 500,
-          onComplete: () => {
-              this.answerContainer.removeAll(true); // Xóa toàn bộ phần tử trong container
-              this.answerButtons = []; // Reset mảng chứa buttons
-          },
-      });
+    });
   }
-}
 
+  clearChoices() {
+    if (this.answerContainer) {
+      this.tweens.add({
+        targets: this.answerContainer.list,
+        alpha: 0,
+        scaleX: 0,
+        scaleY: 0,
+        duration: 500,
+        onComplete: () => {
+          this.answerContainer.removeAll(true);
+          this.answerButtons = [];
+        },
+      });
+    }
+  }
 
-  // Cập nhật phép tính
   updateMathQuestion(operatorType, symbol) {
     let [number1, number2] = this.generateNumbers(operatorType);
     this.correctAnswer = this.calculateAnswer(number1, number2, operatorType);
     this.options = this.generateOptions(this.correctAnswer);
     this.createChoice(this.options);
 
-
     this.questionTextNumber1.setText(`${number1}`);
     this.questionTextNumber2.setText(`${symbol}   ${number2}`);
 
-    // ✅ Thay đổi giá trị trong các button thay vì tạo lại
     this.answerButtons.forEach((choice, index) => {
       choice.txt.setText(this.options[index]);
       choice.btn.setInteractive({ useHandCursor: true });
-  });
-  this.answerButtons.forEach(choice => choice.btn.setInteractive({ useHandCursor: true }));
-  this.answerContainer.setVisible(true);
+    });
+    this.answerButtons.forEach((choice) =>
+      choice.btn.setInteractive({ useHandCursor: true })
+    );
+    this.answerContainer.setVisible(true);
 
-
-    // Cập nhật lại danh sách đáp án
     this.updateChoices();
   }
 
   checkAnswer(selected) {
-    this.answerButtons.forEach(choice => choice.btn.disableInteractive());
+    this.answerButtons.forEach((choice) => choice.btn.disableInteractive());
 
     if (selected === this.correctAnswer) {
       correctCount++;
       this.correctText.setText(`Correct: ${correctCount}`);
       this.answerText.setText(selected);
-      this.successAnimation(); // Gọi animation khi đúng
-      
+      this.successAnimation();
+
       this.sparkles.setVisible(true);
       this.sparkles.play("sparkle");
     } else {
@@ -452,17 +458,13 @@ clearChoices() {
       this.failureAnimation();
     }
 
-
-
-    // Hiển thị đáp án và chờ trước khi tạo câu hỏi mới
     this.time.delayedCall(1500, () => {
       this.sparkles.setVisible(false);
       this.answerText.setText("");
       this.dropCardAnimation(() => {
         this.catchAnimation();
         this.updateMathQuestion(this.currentOperatorType, this.currentSymbol);
-        // chosen = false;
-    });
+      });
     });
   }
 }

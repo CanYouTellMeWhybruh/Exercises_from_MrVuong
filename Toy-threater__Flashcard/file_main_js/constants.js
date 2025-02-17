@@ -1,0 +1,10 @@
+export const RANDOM_COUNT_NUMBER = 5;
+export const RANDOM_NUMBER = Math.floor(Math.random() * 9) + 1;
+export const RANGE_MAX_NUMBER = 9;
+export const RANGE_MIN_NUMBER = 1;
+export const FRAME_RATE = 7;
+export const DEFAULT_SYMBOL = "+";
+export const DEFAULT_TYPE = "add";
+export const HExA_BUTTON = 0xfff66d;
+export const WIDTH_SCENE = window.innerWidth;
+export const HEIGHT_SCENE = window.innerHeight;
